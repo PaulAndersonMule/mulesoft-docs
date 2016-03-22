@@ -326,6 +326,8 @@ For example:
 
 The Mule client provides a convenient way to send a message directly to a component without needing to use a transport when the Mule server is running in the same classloader as the client. This approach can be very useful in testing as well as triggering messages from a JSP page or JavaScript. For example, to dispatch a message directly to your stock quote component called StockManager, you would do the following:
 
+WARNING: code does not compile. Not sure when sendDirect last worked, but it certainly doesn't work now
+
 [source, java, linenums]
 ----
 MuleClient client = new MuleClient(muleContext);
