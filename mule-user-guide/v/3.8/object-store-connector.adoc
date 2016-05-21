@@ -252,22 +252,6 @@ image:objectstore-http-props-store.png[objectstore http config props for store e
 |*Path*|/store
 |===
 +
-. Drag a *Transform Message* Component and add this JSON code as an input into the Transform Message component:
-+
-image:objectstore-transform-message.png[Transform Message Component]
-+
-[source, json, linenums]
-----
-{
-		id: inboundProperties.'http.query.params'.id,
-		name: inboundProperties.'http.query.params'.name,
-		lname: inboundProperties.'http.query.params'.lname,
-		age: inboundProperties.'http.query.params'.age
-}
-----
-[NOTE]
-To map the input to an output structure, define the Output metadata using a JSON sample or JSON schema. Then, you should be able to toggle the preview window using the button at the top right corner of the *Transform Message* window.
-+
 . Next, drag the *Object Store connector* next to the Transform Message component and configure it according to the steps below:
 . Click the plus sign next to the *Connector Configuration* field to add a new *Object Store Global Element*.
 .. Configure the global element according to the table below:
@@ -409,43 +393,55 @@ Paste this code into your XML Editor to quickly load the flow for this example u
 
 [source,xml,linenums]
 ----
-<?xml version="1.0" encoding="UTF-8"?>
-
-<mule xmlns:objectstore="http://www.mulesoft.org/schema/mule/objectstore" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.7.1"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/objectstore http://www.mulesoft.org/schema/mule/objectstore/current/mule-objectstore.xsd
-http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
-http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
-    <objectstore:config name="ObjectStore__Configuration" partition="employees" doc:name="ObjectStore: Configuration"/>
-    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
-    <flow name="objectstore-store-employee-flow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/store" doc:name="HTTP"/>
-        <dw:transform-message doc:name="Transform Message">
-            <dw:set-payload><![CDATA[%dw 1.0
-%output application/json
----
-{
-		id: inboundProperties.'http.query.params'.id,
-		name: inboundProperties.'http.query.params'.name,
-		lname: inboundProperties.'http.query.params'.lname,
-		age: inboundProperties.'http.query.params'.age
-}]]></dw:set-payload>
-        </dw:transform-message>
-        <objectstore:store config-ref="ObjectStore__Configuration" key="#[message.inboundProperties.'http.query.params'.id]" value-ref="#[payload]" doc:name="Store employee"/>
-        <objectstore:all-keys config-ref="ObjectStore__Configuration" doc:name="Get all keys"/>
-        <logger message="Keys : #[payload]" level="INFO" doc:name="Log Employee Id's"/>
-        <set-payload value="Keys : #[payload]" doc:name="Show Employee Id's"/>
-    </flow>
-    <flow name="objectstore-retrieve-employee-flow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/retrieve" doc:name="HTTP"/>
-        <objectstore:retrieve config-ref="ObjectStore__Configuration" key="#[message.inboundProperties.'http.query.params'.id]" doc:name="Retrieve Employee"/>
-        <logger message="Employee: #[payload]" level="INFO" doc:name="Log Employee"/>
-        <set-payload value="Employee : #[payload]" doc:name="Show Employee"/>
-    </flow>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xmlns:objectstore="http://www.mulesoft.org/schema/mule/objectstore"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/objectstore http://www.mulesoft.org/schema/mule/objectstore/current/mule-objectstore.xsd http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">  
+   <objectstore:config name="ObjectStore__Connector"
+                       objectStore-ref="myListableObjectStore"
+                       doc:name="ObjectStore: Connector"/>  
+   <spring:beans>    
+      <spring:bean id="myListableObjectStore"
+                   class="org.mule.util.store.SimpleMemoryObjectStore"/>  
+   </spring:beans>  
+   <flow name="objectstore-store-employee-flow">    
+      <http:listener config-ref="L81" path="/store" doc:name="HTTP">      
+         <http:response-builder>        
+            <http:header headerName="Content-Type" value="application/json"/>      
+         </http:response-builder>    
+      </http:listener>    
+      <logger level="INFO" doc:name="Logger"/>    
+      <set-payload value="#[message.inboundProperties['http.query.params']]"
+                   doc:name="Set Payload"/>    
+      <objectstore:store config-ref="ObjectStore__Connector"
+                         key="#[message.inboundProperties['http.query.params']['id']]"
+                         value-ref="#[payload]"
+                         doc:name="ObjectStore"/>    
+      <json:object-to-json-transformer doc:name="Object to JSON"/>  
+   </flow>  
+   <flow name="objectstore-retrieve-employee-flow">    
+      <http:listener config-ref="L81" path="/retrieve" doc:name="HTTP">      
+         <http:response-builder>        
+            <http:header headerName="Content-Type" value="text/plain"/>      
+         </http:response-builder>    
+      </http:listener>    
+      <logger message="Employee ID from request is : #[message.inboundProperties['http.query.params']['id']]"
+              level="INFO"
+              doc:name="Log Employee ID"/>    
+      <objectstore:retrieve config-ref="ObjectStore__Connector"
+                            key="#[message.inboundProperties['http.query.params']['id']]"
+                            doc:name="ObjectStore"/>    
+      <set-payload value="employee data from object-store is #[payload]"
+                   doc:name="readablePayload"/>    
+      <logger message="employee retrieved from object-store is #[payload]"
+              level="INFO"
+              doc:name="Logger"/>  
+   </flow>
 </mule>
 ----
 
@@ -454,8 +450,12 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 
 . Save and **run** the project as a Mule Application.
 . Open a web browser and enter the below to check the response.
-.. To store a employee record enter the URL `http://localhost:8081/store?id=1&name=David&lname=Malhar&age=10`. The logger will display the list of keys on the browser.
+.. To store a employee record enter the URL `http://localhost:8081/store?id=1&name=David&lname=Malhar&age=10`. 
 .. To retrieve a employee record enter the URL `http://localhost:8081/retrieve?id=1`. The logger will display the employee record in JSON format on the browser.
+
+Notes: 
+. The object-store will throw an exception when an attempt is made to overwrite an existing key: this is expected. The object-store will throw exception when an attempt is made to read using a key that does not exist in the object-store; this too is expected
+. This example uses a simple in-memory store; to clear the contents of this store, restart Mule-runtime
 
 [[demo]]
 === Demo
