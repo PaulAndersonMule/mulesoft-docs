@@ -89,7 +89,11 @@ It's important to know that MEL has not always been the _de facto_ expression la
 
 Mule 3.3.0 introduced Mule Expression Language (MEL), which implements a single set of syntax rules that no longer contains an evaluator. The evaluator, by default, is MEL itself, and it can interpret expressions formerly associated with dozens of different evaluators. MEL expressions are written according to the following format: `#[expression]`. Note the absence of the colon, which signals to Mule that this is a MEL expression; thus Mule evaluates the expression using MEL logic rather than the rules of a specific evaluator.
 
-*Note*: Only use MEL expressions in your application.
+<<< I know this is not PR-material, but it is the most effective way to communicate the issue I see:
+what does this note mean? Where else might MEL expressions be used? It's best not to assume that someone reading docs has whatever context is in the writer's mind at the time. Most people reading these docs _need to find something out_ - leaving anything to assumption or guessing creates difficulties (either in the form of spurious defect-reports, or support-cases - we cannot afford either of these. Precision is important.
+*Note*: Only use MEL expressions in your application. 
+<<< I know this is not PR-material, but it is the most effective way to communicate the issue I see:
+
 
 == Learning MEL
 
