@@ -46,6 +46,9 @@ The list of any applied policies and available policies appears. The list includ
 +
 . At the top of the *Applied policies* list, click the greyed-out *Edit Policy Order* button to assign the priority.
 +
+
+IMPORTANT: the *Edit Policy Order* button is only active when the API is being actively managed by an operational, running API Gateway of appropriate version (see note above).
+
 image:api-click-policies.png[api-click-policies]
 
 . Set the order of execution of the policy to an integer greater than 2.
