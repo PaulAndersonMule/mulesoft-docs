@@ -699,6 +699,13 @@ The lines in the example match the defined structures as listed below:
 * 7 `Check`
 * 8 `EndFile`
 
+Note to docs-team: please provide the project used to do this mapping. Unable to replicate this - error received is
+com.mulesoft.flatfile.lexical.LexicalException: Unexpected end of line8 (read 0 of expected 35 characters in field)
+
+when line 8 is extended, the error message changes to
+com.mulesoft.flatfile.lexical.LexicalException: Missing expected line break after line 8
+
+when a line-break is added after line 8, the same error message persists
 
 
 == Applying a Schema as Metadata
